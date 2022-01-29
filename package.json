@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": ""
+    "test": "jest"
   },
   "lint-staged": {
     "*.js": [
@@ -20,7 +20,9 @@
   "license": "ISC",
   "devDependencies": {
     "husky": "^7.0.4",
+    "jest": "^27.4.7",
     "lint-staged": "^12.3.2",
     "standard": "^16.0.4"
-  }
+  },
+  "dependencies": {}
 }
