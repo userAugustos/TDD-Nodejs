@@ -6,15 +6,8 @@
   "scripts": {
     "test": "jest"
   },
-  "lint-staged": {
-    "*.js": [
-      "standard"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+  "standard": {
+    "env": "jest"
   },
   "author": "Felipe Augustos",
   "license": "ISC",
