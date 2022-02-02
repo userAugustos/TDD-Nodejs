@@ -10,7 +10,19 @@ class HttpResponse {
   static serverError() {
     return {
       statusCode: 500,
-      message: ''
+      // message: ''
+    }
+  }
+  static unauthorizeError() {
+    return {
+      statusCode: 401,
+      message: 'Unauthorized'
+    }
+  }
+  static authorized(accessToken) {
+    return {
+      statusCode: 200,
+      body: accessToken
     }
   }
 }

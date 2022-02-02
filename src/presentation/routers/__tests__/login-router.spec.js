@@ -7,11 +7,15 @@ const makeSut = () => {
     auth(email, password) {
       this.email = email;
       this.password = password;
+
+      return this.accessToken;
     }
   }
 
   const authUseCaseSpy = new AuthUseCaseSpy();
   const sut = new LoginRouter(authUseCaseSpy);
+
+  authUseCaseSpy.accessToken = 'validHash'; // mocking valids returns, because if we want to in the future test another dependecy that is beeing injecting in LoginRouter, the return of the others injections will need to be good, to the component life cicle, so the defualt return of our depencies needs to be good and if we want to test then not working, we mock invalid
 
   return {
     authUseCaseSpy,
@@ -60,5 +64,45 @@ describe('Login Router', () => {
     sut.route(httpRequest);
     expect(authUseCaseSpy.email).toBe(httpRequest.body.email);
     expect(authUseCaseSpy.password).toBe(httpRequest.body.password);
+  })
+  it('Shoudl return 500 if no AuthUseCase is provided', () => {
+    const sut = new LoginRouter(); // my on sut, because i don't wanna inejct AuthUseCase in this test
+    const httpRequest = {
+      body: {
+        email: 'invalidEmail@.com',
+        password: 'invalid_password'
+      }
+    }
+
+    const httpResponse = sut.route(httpRequest);
+
+    expect(httpResponse.statusCode).toBe(500);
+  })
+  it('Shoudl return 401 if invalid credentials are provided', () => {
+    const { authUseCaseSpy, sut } = makeSut();
+    authUseCaseSpy.accessToken = null // spy on my auth return
+
+    const httpRequest = {
+      body: {
+        email: 'invalidEmail@.com',
+        password: 'invalid_password'
+      }
+    }
+
+    const httpResponse = sut.route(httpRequest);
+    expect(httpResponse.statusCode).toBe(401);
+  })
+  it('Shoudl return 200 valid credentials is provided', () => {
+    const { authUseCaseSpy, sut } = makeSut();
+    const httpRequest = {
+      body: {
+        email: 'validEmail@.com',
+        password: 'valid_password'
+      }
+    }
+
+    const httpResponse = sut.route(httpRequest);
+
+    expect(httpResponse.statusCode).toBe(200);
   })
 })
