@@ -1,5 +1,9 @@
 const HttpResponse = require('../../utils/HttpResponse')
 class LoginRouter {
+  constructor(authUseCase) {
+    this.authUseCase = authUseCase;
+  }
+
   route(httpRequest) {
     if (!httpRequest?.body) { // with the "?" i already testing if exists httpRequest and .body
       return HttpResponse.serverError();
@@ -12,6 +16,7 @@ class LoginRouter {
     if (!password) {
       return HttpResponse.badRequest('password');
     }
+    this.authUseCase.auth(email, password);
   }
 }
 
