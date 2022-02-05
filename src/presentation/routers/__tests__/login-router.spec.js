@@ -1,5 +1,8 @@
 const LoginRouter = require('../../routers/login-router');
 const MissingParamError = require('../../../utils/Errors');
+const simpleHashGenerator = require('../../../utils/simpleHashGenerator');
+
+jest.mock('../../../utils/simpleHashGenerator')
 
 const makeSut = () => {
   class AuthUseCaseSpy { // this is not the right useCase is just a mock to test login-router
@@ -8,14 +11,15 @@ const makeSut = () => {
       this.email = email;
       this.password = password;
 
-      return this.accessToken;
+      this.accessToken = simpleHashGenerator(this.email)
+
+      return this.accessToken; // mocking valids returns, because if we want to in the future test another dependecy that is beeing injecting in LoginRouter, the return of the others injections will need to be good, to the component life cicle, so the defualt return of our depencies needs to be good and if we want to test then not working, we mock invalid
     }
   }
 
   const authUseCaseSpy = new AuthUseCaseSpy();
   const sut = new LoginRouter(authUseCaseSpy);
-
-  authUseCaseSpy.accessToken = 'validHash'; // mocking valids returns, because if we want to in the future test another dependecy that is beeing injecting in LoginRouter, the return of the others injections will need to be good, to the component life cicle, so the defualt return of our depencies needs to be good and if we want to test then not working, we mock invalid
+  // authUseCaseSpy.accessToken = 'validHash'; 
 
   return {
     authUseCaseSpy,
@@ -79,9 +83,7 @@ describe('Login Router', () => {
     expect(httpResponse.statusCode).toBe(500);
   })
   it('Shoudl return 401 if invalid credentials are provided', () => {
-    const { authUseCaseSpy, sut } = makeSut();
-    authUseCaseSpy.accessToken = null // spy on my auth return
-
+    const { sut } = makeSut();
     const httpRequest = {
       body: {
         email: 'invalidEmail@.com',
@@ -90,10 +92,13 @@ describe('Login Router', () => {
     }
 
     const httpResponse = sut.route(httpRequest);
+    simpleHashGenerator.mockImplementation(() => Promise.resolve(null))
+
     expect(httpResponse.statusCode).toBe(401);
   })
   it('Shoudl return 200 valid credentials is provided', () => {
     const { authUseCaseSpy, sut } = makeSut();
+    simpleHashGenerator.mockImplementation(() => Promise.resolve('4ashfasdo'))
     const httpRequest = {
       body: {
         email: 'validEmail@.com',
