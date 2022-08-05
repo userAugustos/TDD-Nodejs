@@ -56,7 +56,7 @@ describe('Login Router', () => {
     const httpResponse = sut.route();
     expect(httpResponse.statusCode).toBe(500);
   })
-  it('Shoudl call AuthUseCase with correct params', () => {
+  it('Should call AuthUseCase with correct params', () => {
     const { authUseCaseSpy, sut } = makeSut(); // need to run sut again here, because of dependency injection
     const httpRequest = {
       body: {
@@ -69,7 +69,7 @@ describe('Login Router', () => {
     expect(authUseCaseSpy.email).toBe(httpRequest.body.email);
     expect(authUseCaseSpy.password).toBe(httpRequest.body.password);
   })
-  it('Shoudl return 500 if no AuthUseCase is provided', () => {
+  it('Should return 500 if no AuthUseCase is provided', () => {
     const sut = new LoginRouter(); // my on sut, because i don't wanna inejct AuthUseCase in this test
     const httpRequest = {
       body: {
@@ -82,7 +82,18 @@ describe('Login Router', () => {
 
     expect(httpResponse.statusCode).toBe(500);
   })
-  it('Shoudl return 401 if invalid credentials are provided', () => {
+	it('Should return 500 if AuthUseCase has no auth method', () => {
+		const sut = new LoginRouter({}); // class, but without any methods
+		const httpRequest = {
+			body: {
+				email: 'validEmail@.com',
+				password: 'any_password'
+			},
+		}
+		const httpResponse = sut.route(httpRequest);
+		expect(httpResponse.statusCode).toBe(500);
+	})
+  it('Should return 401 if invalid credentials are provided', () => {
     const { sut } = makeSut();
     const httpRequest = {
       body: {
@@ -96,7 +107,7 @@ describe('Login Router', () => {
 
     expect(httpResponse.statusCode).toBe(401);
   })
-  it('Shoudl return 200 valid credentials is provided', () => {
+  it('Should return 200 valid credentials is provided', () => {
     const { authUseCaseSpy, sut } = makeSut();
     simpleHashGenerator.mockImplementation(() => Promise.resolve('4ashfasdo'))
     const httpRequest = {

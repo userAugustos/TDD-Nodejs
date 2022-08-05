@@ -5,7 +5,7 @@ class LoginRouter {
   }
 
   route(httpRequest) {
-    if (!httpRequest?.body || !this.authUseCase) { // with the "?" i already testing if exists httpRequest and .body
+    if (!httpRequest?.body || !this.authUseCase || !this.authUseCase.auth) { // with the "?" i already testing if exists httpRequest and .body
       return HttpResponse.serverError();
     }
     const { email, password } = httpRequest.body;
@@ -21,6 +21,7 @@ class LoginRouter {
     if (!accessToken) {
       return HttpResponse.unauthorizeError();
     }
+
     return HttpResponse.authorized(accessToken);
   }
 }
