@@ -1,3 +1,4 @@
+const ServerError = require('../utils/Errors');
 const MissingParamError = require('../utils/Errors');
 
 class HttpResponse {
@@ -10,7 +11,7 @@ class HttpResponse {
   static serverError() {
     return {
       statusCode: 500,
-      // message: ''
+      body: new ServerError()
     }
   }
   static unauthorizeError() {
